@@ -19,9 +19,13 @@ encode(Query) ->
 
 % Query
 enc({update_metrics, QMetrics}) ->
-    [<<"UPME">>, [enc_metric(M) || #q_metric{} = M <- QMetrics]];
+    Len = length(QMetrics),
+    [<<"UPME", Len:?int>>, 
+     [enc_metric(M) || #q_metric{} = M <- QMetrics]];
 enc({update_limits, QLimits}) ->
-    [<<"UPLI">>, [enc_limit(L) || #q_limit{} = L <- QLimits]];
+    Len = length(QLimits),
+    [<<"UPLI", Len:?int>>,
+     [enc_limit(L) || #q_limit{} = L <- QLimits]];
 enc(get_over_limit) ->
     [<<"GOVL">>];
 enc(stop) ->
