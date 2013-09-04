@@ -74,13 +74,15 @@ dec_overlimit_change(<<1:?short, Rest/binary>>) ->
 
 -spec read_times(non_neg_integer(), binary(), fun((binary()) -> {X, binary()})) 
         -> {[X], binary()}.
-read_times(0, Binary, _Fun) ->
-    {[], Binary};
-read_times(N, Binary, Fun) when N > 0 ->
-    {Ret, RestBinary} = Fun(Binary),
-    {RestRet, RestRestBinary} = read_times(N - 1, RestBinary, Fun),
-    {[Ret | RestRet], RestRestBinary}.
+read_times(N, Binary, Fun) ->
+    {Ret, RestBinary} = read_times(N, Binary, Fun, []),
+    {lists:reverse(Ret), RestBinary}.
 
+read_times(0, Binary, _Fun, Acc) ->
+    {Acc, Binary};
+read_times(N, Binary, Fun, Acc) when N > 0 ->
+    {Ret, RestBinary} = Fun(Binary),
+    read_times(N - 1, RestBinary, Fun, [Ret | Acc]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
