@@ -1,20 +1,24 @@
 
+-type appkey()   :: nonempty_string().
+-type endpoint() :: atom().
+-type level()    :: atom().
+
 -record(q_metric, {
-        key      :: nonempty_string(),
-        endpoint :: rls_client:endpoint(),
-        level    :: rls_client:level(),
+        key      :: appkey(),
+        endpoint :: endpoint(),
+        level    :: level(),
         count    :: non_neg_integer()
         }).
 
 -record(q_limit, {
-        level    :: rls_client:level(),
-        endpoint :: rls_client:endpoint(),
+        level    :: level(),
+        endpoint :: endpoint(),
         limit    :: non_neg_integer()
         }).
 
 -record(r_overlimit, {
-        key      :: nonempty_string(),
-        endpoint :: rls_client:endpoint(),
+        key      :: appkey(),
+        endpoint :: endpoint(),
         change   :: overlimit_change()
         }).
 
