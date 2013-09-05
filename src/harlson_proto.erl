@@ -54,7 +54,7 @@ decode(Binary) ->
     dec(Binary).
 
 dec(<<"ROVL", Count:?int, Tail/binary>>) ->
-    {OverLimit, _} = read_times(Count, Tail, fun dec_r_overlimit/1),
+    {OverLimit, _} = unfold_binary(Count, Tail, fun dec_r_overlimit/1),
     {overlimit, OverLimit}.
 
 dec_r_overlimit(<<KeySize:?short, Key:KeySize/binary, 
@@ -72,17 +72,17 @@ dec_overlimit_change(<<1:?short, Rest/binary>>) ->
     {overlimit_removed, Rest}.
         
 
--spec read_times(non_neg_integer(), binary(), fun((binary()) -> {X, binary()})) 
+-spec unfold_binary(non_neg_integer(), binary(), fun((binary()) -> {X, binary()})) 
         -> {[X], binary()}.
-read_times(N, Binary, Fun) ->
-    {Ret, RestBinary} = read_times(N, Binary, Fun, []),
+unfold_binary(N, Binary, Fun) ->
+    {Ret, RestBinary} = unfold_binary(N, Binary, Fun, []),
     {lists:reverse(Ret), RestBinary}.
 
-read_times(0, Binary, _Fun, Acc) ->
+unfold_binary(0, Binary, _Fun, Acc) ->
     {Acc, Binary};
-read_times(N, Binary, Fun, Acc) when N > 0 ->
+unfold_binary(N, Binary, Fun, Acc) when N > 0 ->
     {Ret, RestBinary} = Fun(Binary),
-    read_times(N - 1, RestBinary, Fun, [Ret | Acc]).
+    unfold_binary(N - 1, RestBinary, Fun, [Ret | Acc]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
