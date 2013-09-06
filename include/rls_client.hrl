@@ -4,9 +4,8 @@
 -type level()    :: atom().
 
 -record(q_metric, {
-        key      :: appkey(),
-        endpoint :: endpoint(),
-        level    :: level(),
+        key      :: {appkey(), endpoint()},  % Also this is key in ets table,
+        level    :: level(),                 % see rls_instance:create_tab() for ref.
         count    :: non_neg_integer()
         }).
 
@@ -17,8 +16,7 @@
         }).
 
 -record(r_overlimit, {
-        key      :: appkey(),
-        endpoint :: endpoint(),
+        key      :: {appkey(), endpoint()},
         change   :: overlimit_change()
         }).
 

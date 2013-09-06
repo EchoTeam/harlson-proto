@@ -32,7 +32,7 @@ enc(stop) ->
     [<<"STOP">>].
 
 % QMetric
-enc_metric(#q_metric{key = Key, endpoint = Endpoint,
+enc_metric(#q_metric{key = {Key, Endpoint},
                      level = Level, count = Count}) ->
     [enc_bs(Key), enc_bs(atom_to_list(Endpoint)), enc_bs(atom_to_list(Level)),
      <<Count:?int>>].
@@ -61,8 +61,8 @@ dec_r_overlimit(<<KeySize:?short, Key:KeySize/binary,
                   EpSize:?short, Endpoint:EpSize/binary,
                   OverLimitChange/binary>>) ->
     {OvChange, RestBin} = dec_overlimit_change(OverLimitChange),
-    {#r_overlimit{key      = binary_to_list(Key), 
-                  endpoint = list_to_atom(binary_to_list(Endpoint)), 
+    {#r_overlimit{key      = {binary_to_list(Key), 
+                              list_to_atom(binary_to_list(Endpoint))}, 
                   change   = OvChange}, RestBin}.
 
 dec_overlimit_change(<<0:?short, Value:?int, Throttle:?int, Rest/binary>>) ->
@@ -96,8 +96,7 @@ encode_test_() ->
                      3:?short, "std",
                      100500:?int
                    >>,
-                   encode({update_metrics, [#q_metric{key = "test",
-                                                      endpoint = search,
+                   encode({update_metrics, [#q_metric{key = {"test", search},
                                                       level = std,
                                                       count = 100500}]})),
      ?_assertEqual(<<"UPME", 2:?int, 
@@ -110,12 +109,10 @@ encode_test_() ->
                      7:?short, "default",
                      10501:?int
                    >>,
-                   encode({update_metrics, [#q_metric{key = "test",
-                                                      endpoint = search,
+                   encode({update_metrics, [#q_metric{key = {"test", search},
                                                       level = std,
                                                       count = 100500},
-                                            #q_metric{key = "testkey",
-                                                      endpoint = search,
+                                            #q_metric{key = {"testkey", search},
                                                       level = default,
                                                       count = 10501}]})),
      ?_assertEqual(<<"UPME", 4:?int, 
@@ -136,20 +133,16 @@ encode_test_() ->
                      7:?short, "default",
                      10501:?int
                    >>,
-                   encode({update_metrics, [#q_metric{key = "test",
-                                                      endpoint = search,
+                   encode({update_metrics, [#q_metric{key = {"test", search},
                                                       level = std,
                                                       count = 100500},
-                                            #q_metric{key = "testkey",
-                                                      endpoint = search,
+                                            #q_metric{key = {"testkey", search},
                                                       level = default,
                                                       count = 10501},
-                                            #q_metric{key = "test",
-                                                      endpoint = search,
+                                            #q_metric{key = {"test", search},
                                                       level = std,
                                                       count = 100500},
-                                            #q_metric{key = "testkey",
-                                                      endpoint = search,
+                                            #q_metric{key = {"testkey", search},
                                                       level = default,
                                                       count = 10501}
                                            ]})),
@@ -192,8 +185,7 @@ encode_test_() ->
     ].
 
 decode_test_() ->
-    [?_assertEqual({overlimit, [#r_overlimit{key = "test",
-                                             endpoint = search,
+    [?_assertEqual({overlimit, [#r_overlimit{key = {"test", search},
                                              change = #overlimit_add{value = 100,
                                                                      throttle = 0.9}}
                                ]},
@@ -202,19 +194,15 @@ decode_test_() ->
                             6:?short, "search",
                             0:?short, 100:?int, 900:?int
                           >>)),
-     ?_assertEqual({overlimit, [#r_overlimit{key = "test",
-                                             endpoint = search,
+     ?_assertEqual({overlimit, [#r_overlimit{key = {"test", search},
                                              change = #overlimit_add{value = 100,
                                                                      throttle = 1.0}},
-                                #r_overlimit{key = "testkey",
-                                             endpoint = search,
+                                #r_overlimit{key = {"testkey", search},
                                              change = overlimit_removed},
-                                #r_overlimit{key = "devel",
-                                             endpoint = search,
+                                #r_overlimit{key = {"devel", search},
                                              change = #overlimit_add{value = 1000000,
                                                                      throttle = 0.8}},
-                                #r_overlimit{key = "general",
-                                             endpoint = search,
+                                #r_overlimit{key = {"general", search},
                                              change = #overlimit_add{value = 10000000,
                                                                      throttle = 0.7}}
 
