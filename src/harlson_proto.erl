@@ -1,7 +1,7 @@
 -module(harlson_proto).
 -export([encode/1, decode/1]).
 
--include("rls_client.hrl").
+-include("harlson_proto.hrl").
 
 -compile({inline, [enc/1, dec/1]}).
 -compile(inline).

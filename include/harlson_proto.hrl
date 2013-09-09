@@ -4,8 +4,8 @@
 -type level()    :: atom().
 
 -record(q_metric, {
-        key      :: {appkey(), endpoint()},  % Also this is key in ets table,
-        level    :: level(),                 % see rls_instance:create_tab() for ref.
+        key      :: {appkey(), endpoint()},
+        level    :: level(),
         count    :: non_neg_integer()
         }).
 
