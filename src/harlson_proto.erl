@@ -34,12 +34,12 @@ enc(stop) ->
 % QMetric
 enc_metric(#q_metric{key = {Key, Endpoint},
                      level = Level, count = Count}) ->
-    [enc_bs(Key), enc_bs(atom_to_list(Endpoint)), enc_bs(Level),
+    [enc_bs(Key), enc_bs(atom_to_list(Endpoint)), enc_bs(atom_to_list(Level)),
      <<Count:?int>>].
 
 enc_limit(#q_limit{level = Level, endpoint = Endpoint,
                    limit = Limit}) ->
-    [enc_bs(Level), enc_bs(atom_to_list(Endpoint)),
+    [enc_bs(atom_to_list(Level)), enc_bs(atom_to_list(Endpoint)),
      <<Limit:?int>>].
 
 -spec enc_bs(nonempty_string()) -> iodata().
@@ -97,7 +97,7 @@ encode_test_() ->
                      100500:?int
                    >>,
                    encode({update_metrics, [#q_metric{key = {"test", search},
-                                                      level = "std",
+                                                      level = std,
                                                       count = 100500}]})),
      ?_assertEqual(<<"UPME", 2:?int, 
                      4:?short, "test",   % 1st
@@ -110,10 +110,10 @@ encode_test_() ->
                      10501:?int
                    >>,
                    encode({update_metrics, [#q_metric{key = {"test", search},
-                                                      level = "std",
+                                                      level = std,
                                                       count = 100500},
                                             #q_metric{key = {"testkey", search},
-                                                      level = "default",
+                                                      level = default,
                                                       count = 10501}]})),
      ?_assertEqual(<<"UPME", 4:?int, 
                      4:?short, "test",      % 1st
@@ -134,16 +134,16 @@ encode_test_() ->
                      10501:?int
                    >>,
                    encode({update_metrics, [#q_metric{key = {"test", search},
-                                                      level = "std",
+                                                      level = std,
                                                       count = 100500},
                                             #q_metric{key = {"testkey", search},
-                                                      level = "default",
+                                                      level = default,
                                                       count = 10501},
                                             #q_metric{key = {"test", search},
-                                                      level = "std",
+                                                      level = std,
                                                       count = 100500},
                                             #q_metric{key = {"testkey", search},
-                                                      level = "default",
+                                                      level = default,
                                                       count = 10501}
                                            ]})),
      ?_assertEqual(<<"UPLI", 1:?int,
@@ -151,7 +151,7 @@ encode_test_() ->
                      6:?short, "search",
                      1000000:?int
                    >>,
-                   encode({update_limits, [#q_limit{level = "std",
+                   encode({update_limits, [#q_limit{level = std,
                                                     endpoint = search,
                                                     limit = 1000000}
                                           ]})),
@@ -169,16 +169,16 @@ encode_test_() ->
                      6:?short, "search",
                      2:?int
                    >>,
-                   encode({update_limits, [#q_limit{level = "std",
+                   encode({update_limits, [#q_limit{level = std,
                                                     endpoint = search,
                                                     limit = 1000000},
-                                           #q_limit{level = "minimum",
+                                           #q_limit{level = minimum,
                                                     endpoint = search,
                                                     limit = 1000},
-                                           #q_limit{level = "cool",
+                                           #q_limit{level = cool,
                                                     endpoint = search,
                                                     limit = 2000000},
-                                           #q_limit{level = "worst",
+                                           #q_limit{level = worst,
                                                     endpoint = search,
                                                     limit = 2}
                                           ]}))
