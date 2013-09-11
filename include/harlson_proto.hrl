@@ -1,7 +1,7 @@
 
 -type appkey()   :: nonempty_string().
 -type endpoint() :: atom().
--type level()    :: atom().
+-type level()    :: nonempty_string().
 
 -record(q_metric, {
         key      :: {appkey(), endpoint()},
