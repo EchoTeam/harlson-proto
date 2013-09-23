@@ -67,7 +67,7 @@ dec_r_overlimit(<<KeySize:?short, Key:KeySize/binary,
 
 dec_overlimit_change(<<0:?short, Value:?int, Throttle:?int, Rest/binary>>) ->
     {#overlimit_add{value    = Value,
-                    throttle = Throttle * 1.0 / 1000}, Rest};
+                    throttle = Throttle * 1.0 / 1000000}, Rest};
 dec_overlimit_change(<<1:?short, Rest/binary>>) ->
     {overlimit_removed, Rest}.
         
