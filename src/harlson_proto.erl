@@ -192,7 +192,7 @@ decode_test_() ->
                    decode(<<"ROVL", 1:?int,
                             4:?short, "test",
                             6:?short, "search",
-                            0:?short, 100:?int, 900:?int
+                            0:?short, 100:?int, 900000:?int
                           >>)),
      ?_assertEqual({overlimit, [#r_overlimit{key = {"test", search},
                                              change = #overlimit_add{value = 100,
@@ -210,7 +210,7 @@ decode_test_() ->
                    decode(<<"ROVL", 4:?int,
                             4:?short, "test", %-
                             6:?short, "search",
-                            0:?short, 100:?int, 1000:?int,
+                            0:?short, 100:?int, 1000000:?int,
 
                             7:?short, "testkey", %-
                             6:?short, "search",
@@ -218,11 +218,11 @@ decode_test_() ->
 
                             5:?short, "devel", %-
                             6:?short, "search",
-                            0:?short, 1000000:?int, 800:?int,
+                            0:?short, 1000000:?int, 800000:?int,
 
                             7:?short, "general", %-
                             6:?short, "search",
-                            0:?short, 10000000:?int, 700:?int
+                            0:?short, 10000000:?int, 700000:?int
                           >>))
     ].
 
