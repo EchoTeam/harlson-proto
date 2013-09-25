@@ -1,11 +1,10 @@
 {application, harlson_proto,
  [
   {description, "A binary encoder and decoder for harlson-proto"},
-  {vsn, "1"},
+  {vsn, "1.0.0"},
   {applications, [
                   kernel,
                   stdlib
                  ]},
-  {mod, { rls_client_app, []}},
   {env, []}
  ]}.
