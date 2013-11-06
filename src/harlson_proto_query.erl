@@ -1,8 +1,12 @@
--module(harlson_proto_sendrecv).         
+-module(harlson_proto_query).
                                
--export([sendrecv/4, recv_unti_end/3]).
+-export([squery/4, recv_unti_end/3]).
 
-sendrecv(Addr, Port, Timeout, Binary) ->
+-spec squery(inet:ip_address() | inet:hostname(),
+             inet:port_number(),
+             non_neg_integer(),
+             binary()) -> {ok, binary()} | {error, term()}.
+squery(Addr, Port, Timeout, Binary) ->
     case gen_tcp:connect(Addr, Port, [binary, {active, false}], Timeout) of
         {ok, Sock} ->          
             try                
