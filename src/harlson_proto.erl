@@ -26,6 +26,8 @@ enc({update_limits, QLimits}) ->
     Len = length(QLimits),
     [<<"UPLI", Len:?int>>,
      [enc_limit(L) || #q_limit{} = L <- QLimits]];
+enc(get_stats) ->
+    [<<"STAT">>];
 enc(get_over_limit) ->
     [<<"GOVL">>];
 enc(stop) ->
@@ -55,7 +57,10 @@ decode(Binary) ->
 
 dec(<<"ROVL", Count:?int, Tail/binary>>) ->
     {OverLimit, _} = unfold_binary(Count, Tail, fun dec_r_overlimit/1),
-    {overlimit, OverLimit}.
+    {overlimit, OverLimit};
+dec(<<"RTEX", Count:?int, Tail:Count/binary, _Rest/binary>>) ->
+    {text, Tail}.
+
 
 dec_r_overlimit(<<KeySize:?short, Key:KeySize/binary, 
                   EpSize:?short, Endpoint:EpSize/binary,
