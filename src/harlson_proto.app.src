@@ -1,7 +1,7 @@
 {application, harlson_proto,
  [
   {description, "A binary encoder and decoder for harlson-proto"},
-  {vsn, "1.2.0"},
+  {vsn, "1.2.1"},
   {applications, [
                   kernel,
                   stdlib
