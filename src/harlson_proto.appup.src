@@ -1,0 +1,10 @@
+{"1.2.1",
+  [{"1.0.0",[
+     {add_module,harlson_proto_query},
+     {load_module,harlson_proto}
+    ]}],
+  [{"1.0.0",[
+     {load_module,harlson_proto},
+     {delete_module,harlson_proto_query}
+    ]}]
+}.
