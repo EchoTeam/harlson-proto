@@ -25,4 +25,3 @@ erl_std.plt:
 .PHONY: dialyzer
 dialyzer: build_plt
 	dialyzer src/*.erl --plts erl_std.plt
-

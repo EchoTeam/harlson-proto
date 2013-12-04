@@ -20,12 +20,16 @@ encode(Query) ->
 % Query
 enc({update_metrics, QMetrics}) ->
     Len = length(QMetrics),
-    [<<"UPME", Len:?int>>, 
+    [<<"UPMT", Len:?int>>, 
      [enc_metric(M) || #q_metric{} = M <- QMetrics]];
 enc({update_limits, QLimits}) ->
     Len = length(QLimits),
     [<<"UPLI", Len:?int>>,
      [enc_limit(L) || #q_limit{} = L <- QLimits]];
+enc({update_levels, QLevels}) ->
+    Len = length(QLevels),
+    [<<"UPLE", Len:?int>>,
+     [enc_level(L) || #q_level{} = L <- QLevels]];
 enc(get_stats) ->
     [<<"STAT">>];
 enc(get_over_limit) ->
@@ -35,14 +39,17 @@ enc(stop) ->
 
 % QMetric
 enc_metric(#q_metric{key = {Key, Endpoint},
-                     level = Level, count = Count}) ->
-    [enc_bs(Key), enc_bs(atom_to_list(Endpoint)), enc_bs(atom_to_list(Level)),
+                     count = Count}) ->
+    [enc_bs(Key), enc_bs(atom_to_list(Endpoint)),
      <<Count:?int>>].
 
 enc_limit(#q_limit{level = Level, endpoint = Endpoint,
                    limit = Limit}) ->
     [enc_bs(atom_to_list(Level)), enc_bs(atom_to_list(Endpoint)),
      <<Limit:?int>>].
+
+enc_level(#q_level{key = Appkey, level = Level}) ->
+    [enc_bs(Appkey), enc_bs(atom_to_list(Level))].
 
 -spec enc_bs(nonempty_string()) -> iodata().
 enc_bs(String) ->
@@ -95,60 +102,46 @@ unfold_binary(N, Binary, Fun, Acc) when N > 0 ->
 encode_test_() ->
     [?_assertEqual(<<"GOVL">>, encode(get_over_limit)),
      ?_assertEqual(<<"STOP">>, encode(stop)),
-     ?_assertEqual(<<"UPME", 1:?int, 
+     ?_assertEqual(<<"UPMT", 1:?int, 
                      4:?short, "test", 
                      6:?short, "search",
-                     3:?short, "std",
                      100500:?int
                    >>,
                    encode({update_metrics, [#q_metric{key = {"test", search},
-                                                      level = std,
                                                       count = 100500}]})),
-     ?_assertEqual(<<"UPME", 2:?int, 
+     ?_assertEqual(<<"UPMT", 2:?int, 
                      4:?short, "test",   % 1st
                      6:?short, "search",
-                     3:?short, "std",
                      100500:?int,
                      7:?short, "testkey",   % 2nd
                      6:?short, "search",
-                     7:?short, "default",
                      10501:?int
                    >>,
                    encode({update_metrics, [#q_metric{key = {"test", search},
-                                                      level = std,
                                                       count = 100500},
                                             #q_metric{key = {"testkey", search},
-                                                      level = default,
                                                       count = 10501}]})),
-     ?_assertEqual(<<"UPME", 4:?int, 
+     ?_assertEqual(<<"UPMT", 4:?int, 
                      4:?short, "test",      % 1st
                      6:?short, "search",
-                     3:?short, "std",
                      100500:?int,
                      7:?short, "testkey",   % 2nd
                      6:?short, "search",
-                     7:?short, "default",
                      10501:?int,
                      4:?short, "test",      % 3rd
                      6:?short, "search",
-                     3:?short, "std",
                      100500:?int,
                      7:?short, "testkey",   % 4nd
                      6:?short, "search",
-                     7:?short, "default",
                      10501:?int
                    >>,
                    encode({update_metrics, [#q_metric{key = {"test", search},
-                                                      level = std,
                                                       count = 100500},
                                             #q_metric{key = {"testkey", search},
-                                                      level = default,
                                                       count = 10501},
                                             #q_metric{key = {"test", search},
-                                                      level = std,
                                                       count = 100500},
                                             #q_metric{key = {"testkey", search},
-                                                      level = default,
                                                       count = 10501}
                                            ]})),
      ?_assertEqual(<<"UPLI", 1:?int,
@@ -186,6 +179,28 @@ encode_test_() ->
                                            #q_limit{level = worst,
                                                     endpoint = search,
                                                     limit = 2}
+                                          ]})),
+     ?_assertEqual(<<"UPLE", 1:?int,
+                     8:?short, "test-key",
+                     6:?short, "level1"
+                   >>,
+                   encode({update_levels, [#q_level{key = "test-key",
+                                                    level = level1}
+                                          ]})),
+     ?_assertEqual(<<"UPLE", 3:?int,
+                     8:?short, "test-key",
+                     6:?short, "level1",
+                     9:?short, "test-key2",
+                     6:?short, "level2",
+                     10:?short, "test-key30",
+                     6:?short, "level3"
+                   >>,
+                   encode({update_levels, [#q_level{key = "test-key",
+                                                    level = level1},
+                                           #q_level{key = "test-key2",
+                                                    level = level2},
+                                           #q_level{key = "test-key30",
+                                                    level = level3}
                                           ]}))
     ].
 
