@@ -5,8 +5,12 @@
 
 -record(q_metric, {
         key      :: {appkey(), endpoint()},
-        level    :: level(),
         count    :: non_neg_integer()
+        }).
+
+-record(q_level, {
+        key      :: appkey(),
+        level    :: level()
         }).
 
 -record(q_limit, {
@@ -28,6 +32,7 @@
 -type overlimit_change() :: overlimit_removed | #overlimit_add{}.
 
 -type rls_query() :: {update_metrics, [#q_metric{}]} 
+                   | {update_levels,  [#q_level{}]}
                    | {update_limits,  [#q_limit{}]}
                    | get_over_limit
                    | stop.

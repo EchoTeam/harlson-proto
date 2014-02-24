@@ -8,3 +8,11 @@
      {delete_module,harlson_proto_query}
     ]}]
 }.
+{"1.3.0",
+  [{"1.2.1",[
+     {load_module,harlson_proto}
+    ]}],
+  [{"1.2.1",[
+     {load_module,harlson_proto},
+    ]}]
+}.
